@@ -1,0 +1,56 @@
+<!doctype html>
+<title>Results</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/my_css.css') }}">
+
+<head>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script type=text/javascript>
+	// 	$(document).ready(function(){
+	// 		var toggle_div_id = 'answer_panel' + $(this).attr('id')
+	// 	    $("#flip, #flip2").click(function(){
+	// 	        $("#answer_panel").slideToggle("slow");
+	// 	    });
+	// 	});
+	// </script>
+	<!-- WORKS -->
+	<script type="text/javascript">
+
+	$(document).ready(function() {          
+	    $('.flip').each(function(){
+	        var toggle_div_id = 'answer_panel_' + $(this).attr('id');
+	        $(this).click(function(){
+	        	console.log(toggle_div_id, this);
+	            $('#'+toggle_div_id).slideToggle("slow");
+	        });
+	    });
+	});
+
+	// </script>
+
+
+	<style> 
+
+	</style>
+
+
+</head>
+
+<div>
+{% for i in data %}
+<ul class="list-group">
+	<li class="list-group-item">
+		<div class="panel panel-primary">
+			<div class="panel panel-default">
+			<h3 class="panel-title"><div class="flip" id="flip{{loop.index}}" class="list-group-item panel panel-primary">Title: {{ i[0] }}</div></h3>
+			<div class="panel-body"> {{ i[1] | safe }} </div>
+			</div>
+			<div class="flip" id="flip{{loop.index}}" class="list-group-item panel panel-primary"> See Answer </div>
+			<div class="initiallyHidden" id="answer_panel_flip{{loop.index}}">{{ i[2] | safe }}</div>
+		</div>
+	</li>
+</ul>
+{% endfor %}
+
+</div>
+

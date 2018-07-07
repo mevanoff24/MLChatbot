@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+
+
+<style>
+code {background-color: gray;}
+code {
+  display: block;
+  white-space: pre-wrap   
+}
+</style>
+
+
+
+<p>I have been trying to implement logistic regression for a classification problem, but it is giving me really bizarre results. I have gotten decent results with gradient boosting and random forests so I thought of getting to basic and see what best can I achieve. Can you help me point out what am I doing wrong that is causing this overfitting? You can get the data from <a href='https://www.kaggle.com/c/santander-customer-satisfaction/data' rel='nofollow'>https://www.kaggle.com/c/santander-customer-satisfaction/data</a></p> <p>Here is my code:</p> <pre><code>import pandas as pd import numpy as np train = pd.read_csv('path') test = pd.read_csv('path') test['TARGET'] = 0 fullData = pd.concat([train,test], ignore_index = True) remove1 = [] for col in fullData.columns: if fullData[col].std() == 0: remove1.append(col) fullData.drop(remove1, axis=1, inplace=True) import numpy as np remove = [] cols = fullData.columns for i in range(len(cols)-1): v = fullData[cols[i]].values for j in range(i+1,len(cols)): if np.array_equal(v,fullData[cols[j]].values): remove.append(cols[j]) fullData.drop(remove, axis=1, inplace=True) from sklearn.cross_validation import train_test_split X_train, X_test = train_test_split(fullData, test_size=0.20, random_state=1729) print(X_train.shape, X_test.shape) y_train = X_train['TARGET'].values X = X_train.drop(['TARGET','ID'],axis=1,inplace = False) from sklearn.ensemble import ExtraTreesClassifier clf = ExtraTreesClassifier(random_state=1729) selector = clf.fit(X, y_train) from sklearn.feature_selection import SelectFromModel fs = SelectFromModel(selector, prefit=True) X_t = X_test.drop(['TARGET','ID'],axis=1,inplace = False) X_t = fs.transform(X_t) X_tr = X_train.drop(['TARGET','ID'],axis=1,inplace = False) X_tr = fs.transform(X_tr) from sklearn.linear_model import LogisticRegression log = LogisticRegression(penalty ='l2', C = 1, random_state = 1, ) from sklearn import cross_validation scores = cross_validation.cross_val_score(log,X_tr,y_train,cv = 10) print(scores.mean()) log.fit(X_tr,y_train) predictions = log.predict(X_t) predictions = predictions.astype(int) print(predictions.mean()) </code></pre>
+
+
+"sklearn Python and Logistic regression <p>Good night, community!</p> <p>I have a simple question whose answer may not be as simple:</p> <p>How can I show the independent variable coefficients of a Logistic regression model using Python's <a href='http://scikit-learn.org/' rel='nofollow'>SciKit Learn</a>?</p> <p>if <code>model</code> is your <code>sklearn.linear_model.LogisticRegression</code> then the coeffecients are accessible in <code>model.coef_</code></p>")
