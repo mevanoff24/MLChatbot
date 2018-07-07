@@ -29,4 +29,4 @@ Web app that allows users to ask a coding question and returns similar questions
 
 #### Answer 
 
-![image](https://user-images.githubusercontent.com/8717434/42413164-63fc1e28-81cf-11e8-9e70-7f999fb072c3.png)
+![image](https://user-images.githubusercontent.com/8717434/42413174-a6074770-81cf-11e8-9793-a5cda0719c56.png)
