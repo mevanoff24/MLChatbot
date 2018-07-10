@@ -13,11 +13,13 @@ import numpy as np
 
 sys.path.append(os.path.abspath("../"))
 
-from dialogue_manager_python import DialogueManager
+# from dialogue_manager_python import DialogueManager
+from dialogue_manager import DialogueManager
 from config import * 
 from utils import *
 
-DB_NAME = '../StackOverflow_python.db'
+# DB_NAME = '../StackOverflow_python.db'
+DB_NAME = '../StackOverflow.db'
 
 
 # load model class 
@@ -56,12 +58,12 @@ def predict():
         results, distances = dm.get_similar(clean_question, topk=10, load=True, save=False, return_dist=True)
         df_parent, df_comments = dm.get_comments(results, connection=connection)
         df = dm.merge_parent_comment(df_parent, df_comments, results, distances)
-        # get best results top 5? 
+        
         
 
 #         df = pd.read_csv(OUTPUT_PATH/'final_df.csv')
-        df = df[['title', 'comment_parent', 'comment_comment', 'distances']]
-#         df = df.loc[[4, 5, 6]]
+#         df = df[['title', 'comment_parent', 'comment_comment', 'distances']]
+        df = df[['title', 'comment_parent', 'comment_comment', 'distances', 'tags']]
         data = []
         for title, parent_comment, answer, distance in zip(df['title'], df['comment_parent'], df['comment_comment'], df['distances']):
             data.append((title, parent_comment, answer, np.round(distance, 2)))

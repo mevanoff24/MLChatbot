@@ -42,8 +42,48 @@ def average_tfidf_vectors(question, embeddings, dim, vect, idf_scores):
         words_embedding[:, i] = embed_score * idf_score    
     return words_embedding.mean(axis=1)
 
+def avg_word_vectors_OOV(question, embeddings, fasttext_embeddings, dim):
+    
+    words_embedding = []
+    for word in question.lower().split():
+        if word in embeddings:
+            words_embedding.append(embeddings[word])
+        else:
+            cosine_similarities = linear_kernel([fasttext_embeddings[word]], np.array(word_list)[:, 1:])
+            related_docs_indices = cosine_similarities.argsort()[:-10:-1]
+            words_embedding.append(word_list[related_docs_indices[0][0]][1:])
+            
+    if not words_embedding:
+        return np.zeros(dim)
+    words_embedding = np.array(words_embedding).astype(np.float32)
+    return words_embedding.mean(axis=0)
 
-def get_embeddings(filename):
+
+def average_tfidf_vectors_OOV(question, embeddings, fasttext_embeddings, dim, vect, idf_scores):
+    split_question = [word for word in question.lower().split()]
+    
+    if not split_question:
+        return np.zeros(dim).astype(np.float32)
+    
+    words_embedding = np.zeros((dim, len(split_question))).astype(np.float32)
+    
+    for i, token in enumerate(split_question):
+        if token in embeddings:
+            embed_score = embeddings[token]
+        else: 
+            cosine_similarities = linear_kernel([fasttext_embeddings[token]], np.array(word_list)[:, 1:])
+            related_docs_indices = cosine_similarities.argsort()[:-10:-1]
+            embed_score = word_list[related_docs_indices[0][0]][1:]
+        # get idf weights
+        if idf_scores[token]:
+            idf_score = idf_scores[token]
+        else: idf_score = 1
+        # word vectors multiply by their TF-IDF scores
+        words_embedding[:, i] = embed_score * idf_score    
+    return words_embedding.mean(axis=1)
+
+
+def get_embeddings(filename, array=False):
     embeddings = {}
     with open(MODEL_PATH/filename, newline='') as f:
         reader = csv.reader(f, delimiter='\t')
@@ -52,7 +92,22 @@ def get_embeddings(filename):
         embeddings[line[0]] = np.asarray(line[1:], dtype=np.float32)
         
     dim = len(embeddings['code'])
+    if array:
+        return embeddings, embed_list, dim
     return embeddings, dim
+
+
+
+# def get_embeddings(filename):
+#     embeddings = {}
+#     with open(MODEL_PATH/filename, newline='') as f:
+#         reader = csv.reader(f, delimiter='\t')
+#         embed_list = list(reader)
+#     for line in embed_list:
+#         embeddings[line[0]] = np.asarray(line[1:], dtype=np.float32)
+        
+#     dim = len(embeddings['code'])
+#     return embeddings, dim
 
 
 def unpickle(filename):
