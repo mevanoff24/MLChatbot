@@ -10,6 +10,12 @@ Web app that allows users to ask a coding question and returns similar questions
 - Word vectors trained with [https://github.com/facebookresearch/StarSpace](https://github.com/facebookresearch/StarSpace)
 - Approximate Nearest Neighbors lookup for quick response (query time 0:00:00.000383)
 
+## Data 
+- pass 
+
+## Dependencies 
+- python 3.6 
+
 
 ## In Progress
 - Web Hosting - AWS Lambda (coming soon!)
@@ -18,10 +24,17 @@ Web app that allows users to ask a coding question and returns similar questions
 
 
 
-
+### TODO:
+- add docstrings
+- improve READEME (metrics, more thorough this file)
+- put notebooks in specific folders
+- more comments 
+- push rec system to github
 
 
 ## Demo
+
+Overview of project 
 
 
 #### Question 
