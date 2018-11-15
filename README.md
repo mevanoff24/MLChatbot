@@ -1,6 +1,19 @@
 # MLChatbot
-Web app that allows users to ask a coding question and returns similar questions and answers
+Web app that allows users to ask any programming, coding, AI, system question and returns similar questions and answers. The motivation behind this app is to allow users a 'one-shot response'. Instead of having to scroll through the multiple results and pages from a Google Search, this app returns everything in one click. This systems is built based on the combination of a 'Keyword Recognition-Based Chatbot' and a 'Natural Language Processing Chatbots'. It does have a 'pre-loaded' response system in place, but it also heavily utilizes a contextual understanding of a question towards its resolution. [[1]](https://www.taskus.com/blog/keyword-based-natural-language-processing-chatbots-mean/)
 
+
+Fast prediction time is definitely needed. Large dataset. 
+
+## Approach
+
+When a users asks a question, this process is as follows
+- first the question is cleaned, a [term frequency–inverse document frequency](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) is applied to create features, then we predict the programming language that the user question refers to with a 'Tag Classifier'. We run the top 3 results ( top 1 depending on how confident the model is). This allows us not to have to run through the entire database of data and reduces the look up 90%. 
+- Next, we create an the average word vector for User. As the user's question sentence represents a sentence by averaging the weighted word embeddings of all words, with the weight of a word is given by tf-idf [[2]](http://www.aclweb.org/anthology/S17-2100), [[3]](http://aclweb.org/anthology/P/P16/P16-1089.pdf). This helps learn the neuance of the question. We have trained custom word embeddings with [facebook's StarSpace](https://github.com/facebookresearch/StarSpace) to get some more 'finer-detail'. 
+- We then get topk closest neighbors with Approximate Nearest Neighbor [[4]](https://arxiv.org/pdf/1806.09823.pdf). Based on pre-trained tf-idf average word vectors for each answer in our database. 
+
+
+
+All the data is from Stack Overflow questions and answers datasets is cleaned and parsed into a large database.  
 
 ## Process
 - Finding similaritites based on [Stack Overflow questions and answers datasets](https://archive.org/details/stackexchange)
