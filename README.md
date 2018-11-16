@@ -1,27 +1,68 @@
 # MLChatbot
-Web app that allows users to ask any programming, coding, AI, system question and returns similar questions and answers. The motivation behind this app is to allow users a 'one-shot response'. Instead of having to scroll through the multiple results and pages from a Google Search, this app returns everything in one click. This systems is built based on the combination of a 'Keyword Recognition-Based Chatbot' and a 'Natural Language Processing Chatbots'. It does have a 'pre-loaded' response system in place (Stack Overflow answers), but it also heavily utilizes a contextual understanding of a question towards its resolution. [[1]](https://www.taskus.com/blog/keyword-based-natural-language-processing-chatbots-mean/)
+Web app that allows users to ask any programming, coding, AI, framework, system related Question and returns the most 'similar' questions and answers. The motivation behind this app is to allow users a 'one-shot' response. Instead of having to scroll through the multiple results and pages from a Google Search, this app returns everything in one click. This systems is built based on the combination of a 'Keyword Recognition-Based Chatbot' and a 'Natural Language Processing Chatbots'. It does have a 'pre-loaded' response system in place (data is parsed from [Stack Overflow]((https://archive.org/details/stackexchange))), but it also heavily utilizes a contextual understanding of a question towards its resolution. [[1]](https://www.taskus.com/blog/keyword-based-natural-language-processing-chatbots-mean/)
 
  
 
 ## Approach
 
-When a users asks a question, this process is as follows
-- First the question is cleaned, a [term frequency–inverse document frequency](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) is applied to create input features, then we predict the programming language that the user question refers to with a Logistic Regression 'Tag Classifier'. We return the top 3 results (top 1 depending on how confident the model is). This allows us not to have to run through the entire database of data and reduces the look up 90%. 
-- Next, we create an the average word vector for User's question. As the user's question sentence represents a sentence by averaging the weighted word embeddings of all words, with the weight of a word is given by tf-idf [[2]](http://www.aclweb.org/anthology/S17-2100), [[3]](http://aclweb.org/anthology/P/P16/P16-1089.pdf). This helps learn the neuance of the question. We have trained custom word embeddings with [facebook's StarSpace](https://github.com/facebookresearch/StarSpace) to get some more 'finer-detail' in the embeddings.  
-- We then get 'topk' closest neighbors with Approximate Nearest Neighbor [[4]](https://arxiv.org/pdf/1806.09823.pdf). Based on pre-trained tf-idf average word vectors for each response in our database. 
-- After we return the top neighbors from our locality sensitive hashing, we do one last 'weighing' to sort the top responsese. We weigh this 'similarity' score based on [levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance), Tf-Idf similarity and [symbolic n-grams](https://sites.google.com/site/textdigitisation/ngrams) with [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis). 
-- We then can finally output the top responsed based on this weighted 'similarity' score from these features. 
+When a users asks a question, this process is as follows:
+- The user's question is cleaned, a [term frequency–inverse document frequency](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) is applied to create input features, then we predict the `tag` (programming language or framework) that the user's question refers to with a 'Tag Classifier'. We return the top 3 results (or top 1 depending on how confident the model is). This allows us not to have to run through the entire database of data and reduces the DB look up 90%. 
+- Next, the user's question is represented by averaging the weighted word embeddings of all words with the weight of a word given by tf-idf [[2]](http://www.aclweb.org/anthology/S17-2100), [[3]](http://aclweb.org/anthology/P/P16/P16-1089.pdf). This helps learn the neuance of the question and puts more emphasis on rare words. Since programming, ML, etc. are non-typical words that wouldn't commonly occur in pre-trained word vectors such as [Word2vec](https://en.wikipedia.org/wiki/Word2vec) or [GloVe](https://nlp.stanford.edu/projects/glove/), we train custom word embeddings with [facebook's StarSpace](https://github.com/facebookresearch/StarSpace) to get some more 'finer-detail' in the embeddings. 
+- We then get the 'topk' closest neighbors with an Approximate Nearest Neighbor algorithm [[4]](https://arxiv.org/pdf/1806.09823.pdf) comparing the transformed user's question to the pre-trained tf-idf weighted average word vectors from top `tags`. 
+- After we return the top neighbors from our locality sensitive hashing algorihms, we do one last 'weighting' to sort the top responsese. We weigh this 'similarity' score based on [levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance), Tf-Idf similarity and [symbolic n-grams](https://sites.google.com/site/textdigitisation/ngrams) with [PCA](https://en.wikipedia.org/wiki/Principal_component_analysis). 
+- We then can finally output the top responsed based on this weighted 'similarity' score from these features.
 
 
+## Results 
+Average Query time 0.76484225 seconds 
+
+### Metrics 
+
+The first simple metric will be a number of correct hits for some *K*: **Hits@K**
+$$ \text{Hits@K} = \frac{1}{N}\sum_{i=1}^N \, [dup_i \in topK(q_i)]$$
+
+where $q_i$ is the i-th query, $dup_i$ is its duplicate, $topK(q_i)$ is the top K elements of the ranked sentences provided by our model and the operation $[dup_i \in topK(q_i)]$ equals 1 if the condition is true and 0 otherwise (more details about this operation could be found [here](https://en.wikipedia.org/wiki/Iverson_bracket)).
+
+The second one is a simplified [DCG metric](https://en.wikipedia.org/wiki/Discounted_cumulative_gain): **DCG@K**
+
+$$ \text{DCG@K} = \frac{1}{N} \sum_{i=1}^N\frac{1}{\log_2(1+rank_{dup_i})}\cdot[rank_{dup_i} \le K] $$
+
+where $rank_{dup_i}$ is a position of the duplicate in the sorted list of the nearest sentences for the query $q_i$. According to this metric, the model gets a higher reward for a higher position of the correct answer. If the answer does not appear in topK at all, the reward is zero. 
+
+Based on the results of 
+
+input:
+```
+test_embeddings(embeddings, 300, average_tfidf_vectors, vect=vect)
+```
+output:
+```
+DCG@   1: 0.453 | Hits@   1: 0.453
+DCG@   5: 0.548 | Hits@   5: 0.631
+DCG@  10: 0.567 | Hits@  10: 0.690
+DCG@ 100: 0.602 | Hits@ 100: 0.861
+DCG@ 500: 0.616 | Hits@ 500: 0.964
+DCG@1000: 0.619 | Hits@1000: 1.000
+```
+
+input:
+```
+test_embeddings(embeddings, 100, average_tfidf_vectors, vect=vect)
+```
+output:
+```
+DCG@   1: 0.441 | Hits@   1: 0.441
+DCG@   5: 0.533 | Hits@   5: 0.614
+DCG@  10: 0.554 | Hits@  10: 0.678
+DCG@ 100: 0.591 | Hits@ 100: 0.854
+DCG@ 500: 0.605 | Hits@ 500: 0.965
+DCG@1000: 0.609 | Hits@1000: 1.000
+```
+We actually went with the simpler model of 100 dimensional word vectors instead of the 300 dimensional word vectors for computational reasoning despite the marginal gain in DCG and Hits @ K. This greatly helped the average query time and memory requirements. 
 
 
-## Process
-- Finding similaritites based on [Stack Overflow questions and answers datasets](https://archive.org/details/stackexchange)
-- Runs a 'Tag Classifier' to predict the programming language to subset the database 
-- Similarity based on Tf-Idf Average Word Vectors with pre-computed word vectors.
-- Weigh 'similarity' score based on levenshtein distance, Tf-Idf similarity and symbolic n-grams with PCA. 
-- Word vectors trained with [https://github.com/facebookresearch/StarSpace](https://github.com/facebookresearch/StarSpace)
-- Approximate Nearest Neighbors lookup for quick response (query time 0:00:00.000383)
+----
+
 
 ## Data 
 
@@ -43,9 +84,7 @@ Most data is from th [Stack Overflow questions and answers datasets](https://arc
 
 
 ### TODO:
-- add docstrings in `app.py` and `utils.py`
 - improve READEME (metrics, more thorough this file)
-- add chatbot model
 - write questions on pad 
 
 questions
@@ -56,6 +95,7 @@ questions
 things to bring up
 - recommender system
 - text summarization
+- GPU and comp
 - 
 
 why NLP
