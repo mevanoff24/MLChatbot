@@ -18,24 +18,30 @@ Average Query time 0.76484225 seconds
 
 ### Metrics 
 
-The first simple metric will be a number of correct hits for some *K*: **Hits@K**
-$$ \text{Hits@K} = \frac{1}{N}\sum_{i=1}^N \, [dup_i \in topK(q_i)]$$
-
-where $q_i$ is the i-th query, $dup_i$ is its duplicate, $topK(q_i)$ is the top K elements of the ranked sentences provided by our model and the operation $[dup_i \in topK(q_i)]$ equals 1 if the condition is true and 0 otherwise (more details about this operation could be found [here](https://en.wikipedia.org/wiki/Iverson_bracket)).
+The first simple metric will be a number of correct hits for [some *K*](https://en.wikipedia.org/wiki/Iverson_bracket): **Hits@K**
+```
+dup_ranks = np.array(dup_ranks)
+len(dup_ranks[dup_ranks <= k]) / len(dup_ranks)
+```
 
 The second one is a simplified [DCG metric](https://en.wikipedia.org/wiki/Discounted_cumulative_gain): **DCG@K**
+```
+dup_ranks = np.array(dup_ranks)
+N = len(dup_ranks)
+dup_ranks = dup_ranks[dup_ranks <= k]
+np.sum((np.ones_like(dup_ranks)) / (np.log2(1.0 + dup_ranks))) / float(N)
+```
+Where `dup_ranks` is a list of duplicates' ranks, one rank per question. And `k` is the number of top-ranked elements. 
 
-$$ \text{DCG@K} = \frac{1}{N} \sum_{i=1}^N\frac{1}{\log_2(1+rank_{dup_i})}\cdot[rank_{dup_i} \le K] $$
 
-where $rank_{dup_i}$ is a position of the duplicate in the sorted list of the nearest sentences for the query $q_i$. According to this metric, the model gets a higher reward for a higher position of the correct answer. If the answer does not appear in topK at all, the reward is zero. 
 
 Based on the results of 
 
-input:
+**input:**
 ```
 test_embeddings(embeddings, 300, average_tfidf_vectors, vect=vect)
 ```
-output:
+**output:**
 ```
 DCG@   1: 0.453 | Hits@   1: 0.453
 DCG@   5: 0.548 | Hits@   5: 0.631
@@ -45,11 +51,11 @@ DCG@ 500: 0.616 | Hits@ 500: 0.964
 DCG@1000: 0.619 | Hits@1000: 1.000
 ```
 
-input:
+**input:**
 ```
 test_embeddings(embeddings, 100, average_tfidf_vectors, vect=vect)
 ```
-output:
+**output:**
 ```
 DCG@   1: 0.441 | Hits@   1: 0.441
 DCG@   5: 0.533 | Hits@   5: 0.614
@@ -80,28 +86,6 @@ Most data is from th [Stack Overflow questions and answers datasets](https://arc
 - Generic ChatBot - Sequence to Sequence with Attention - Tensorflow. Use another classifier to predict if the user's response is a programming question or general chat (and use ChatBot for general chat)
 - 'Rogue' agent. Generative Language Model agent to produce a legible english response. Language model trained on stack overflow answers. Using a pre-trained Language model from Wiki Articles 
 
-
-
-
-### TODO:
-- improve READEME (metrics, more thorough this file)
-- write questions on pad 
-
-questions
-- percent of people who get job
-- project during, from other company data? 
-
-
-things to bring up
-- recommender system
-- text summarization
-- GPU and comp
-- 
-
-why NLP
-- so much more opportunity, just starting to get good in NLP
-- so much data to be extracted still. Sentiment, extration techniques, summarization, chatbots, captioning
-- so much ambiguity in language
 
 
 
