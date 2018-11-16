@@ -45,6 +45,8 @@ Most data is from th [Stack Overflow questions and answers datasets](https://arc
 ### TODO:
 - add docstrings in `app.py` and `utils.py`
 - improve READEME (metrics, more thorough this file)
+- add chatbot model
+- write questions on pad 
 
 
 
