@@ -48,6 +48,21 @@ Most data is from th [Stack Overflow questions and answers datasets](https://arc
 - add chatbot model
 - write questions on pad 
 
+questions
+- percent of people who get job
+- project during, from other company data? 
+
+
+things to bring up
+- recommender system
+- text summarization
+- 
+
+why NLP
+- so much more opportunity, just starting to get good in NLP
+- so much data to be extracted still. Sentiment, extration techniques, summarization, chatbots, captioning
+- so much ambiguity in language
+
 
 
 ## Demo
