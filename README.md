@@ -35,17 +35,16 @@ Most data is from th [Stack Overflow questions and answers datasets](https://arc
 
 
 ## In Progress
-- Web Hosting - AWS Lambda (coming soon!)
-- Generic ChatBot - Sequence to Sequence with Attention - Tensorflow
+- Web Hosting - AWS Lambda
+- Generic ChatBot - Sequence to Sequence with Attention - Tensorflow. Use another classifier to predict if the user's response is a programming question or general chat (and use ChatBot for general chat)
 - 'Rogue' agent. Generative Language Model agent to produce a legible english response. Language model trained on stack overflow answers. Using a pre-trained Language model from Wiki Articles 
 
 
 
+
 ### TODO:
-- add docstrings
+- add docstrings in `app.py` and `utils.py`
 - improve READEME (metrics, more thorough this file)
-- put notebooks in specific folders
-- more comments 
 
 
 
