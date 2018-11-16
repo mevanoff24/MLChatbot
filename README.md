@@ -2,6 +2,22 @@
 Web app that allows users to ask any programming, coding, AI, framework, system related Question and returns the most 'similar' questions and answers. The motivation behind this app is to allow users a 'one-shot' response. Instead of having to scroll through the multiple results and pages from a Google Search, this app returns everything in one click. This systems is built based on the combination of a 'Keyword Recognition-Based Chatbot' and a 'Natural Language Processing Chatbots'. It does have a 'pre-loaded' response system in place (data is parsed from [Stack Overflow]((https://archive.org/details/stackexchange))), but it also heavily utilizes a contextual understanding of a question towards its resolution. [[1]](https://www.taskus.com/blog/keyword-based-natural-language-processing-chatbots-mean/)
 
  
+ 
+## Demo
+
+Here might be a quick overview of of what the app does
+
+
+#### Question 
+
+<img width="1269" alt="screen shot 2018-08-08 at 9 17 13 am" src="https://user-images.githubusercontent.com/8717434/43850126-f62510fe-9aeb-11e8-9ca7-d01937895d22.png">
+
+
+#### Answer 
+
+<img width="1275" alt="screen shot 2018-08-08 at 9 16 56 am" src="https://user-images.githubusercontent.com/8717434/43850199-21a886c0-9aec-11e8-9ce3-0a068c0327ce.png">
+
+
 
 ## Approach
 
@@ -85,28 +101,6 @@ Most data is from th [Stack Overflow questions and answers datasets](https://arc
 - Web Hosting - AWS Lambda
 - Generic ChatBot - Sequence to Sequence with Attention - Tensorflow. Use another classifier to predict if the user's response is a programming question or general chat (and use ChatBot for general chat)
 - 'Rogue' agent. Generative Language Model agent to produce a legible english response. Language model trained on stack overflow answers. Using a pre-trained Language model from Wiki Articles 
-
-
-
-
-## Demo
-
-Here might be a quick overview of of what the app does
-
-
-#### Question 
-
-<img width="1269" alt="screen shot 2018-08-08 at 9 17 13 am" src="https://user-images.githubusercontent.com/8717434/43850126-f62510fe-9aeb-11e8-9ca7-d01937895d22.png">
-
-
-#### Answer 
-
-<img width="1275" alt="screen shot 2018-08-08 at 9 16 56 am" src="https://user-images.githubusercontent.com/8717434/43850199-21a886c0-9aec-11e8-9ce3-0a068c0327ce.png">
-
-
-
-
-
 
 
 ## Requirements  
